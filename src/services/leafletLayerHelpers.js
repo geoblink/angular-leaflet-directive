@@ -457,35 +457,39 @@ angular.module('leaflet-directive')
       return false;
     }
 
-    if (Object.keys(layerTypes).indexOf(layerDefinition.type) === -1) {
-      $log.error('[AngularJS - Leaflet] A layer must have a valid type: ' + Object.keys(layerTypes));
-      return false;
-    }
+    // One of the known types
+    if (Object.keys(layerTypes).indexOf(layerDefinition.type) !== -1) {
 
-    // Check if the layer must have an URL
-    if (layerTypes[layerDefinition.type].mustHaveUrl && !isString(layerDefinition.url)) {
-      $log.error('[AngularJS - Leaflet] A base layer must have an url');
-      return false;
-    }
+      // Check if the layer must have an URL
+      if (layerTypes[layerDefinition.type].mustHaveUrl && !isString(layerDefinition.url)) {
+        $log.error('[AngularJS - Leaflet] A base layer must have an url');
+        return false;
+      }
 
-    if (layerTypes[layerDefinition.type].mustHaveData && !isDefined(layerDefinition.data)) {
-      $log.error('[AngularJS - Leaflet] The base layer must have a "data" array attribute');
-      return false;
-    }
+      if (layerTypes[layerDefinition.type].mustHaveData && !isDefined(layerDefinition.data)) {
+        $log.error('[AngularJS - Leaflet] The base layer must have a "data" array attribute');
+        return false;
+      }
 
-    if (layerTypes[layerDefinition.type].mustHaveLayer && !isDefined(layerDefinition.layer)) {
-      $log.error('[AngularJS - Leaflet] The type of layer ' + layerDefinition.type + ' must have an layer defined');
-      return false;
-    }
+      if (layerTypes[layerDefinition.type].mustHaveLayer && !isDefined(layerDefinition.layer)) {
+        $log.error('[AngularJS - Leaflet] The type of layer ' + layerDefinition.type + ' must have an layer defined');
+        return false;
+      }
 
-    if (layerTypes[layerDefinition.type].mustHaveBounds && !isDefined(layerDefinition.bounds)) {
-      $log.error('[AngularJS - Leaflet] The type of layer ' + layerDefinition.type + ' must have bounds defined');
-      return false;
-    }
+      if (layerTypes[layerDefinition.type].mustHaveBounds && !isDefined(layerDefinition.bounds)) {
+        $log.error('[AngularJS - Leaflet] The type of layer ' + layerDefinition.type + ' must have bounds defined');
+        return false;
+      }
 
-    if (layerTypes[layerDefinition.type].mustHaveKey && !isDefined(layerDefinition.key)) {
-      $log.error('[AngularJS - Leaflet] The type of layer ' + layerDefinition.type + ' must have key defined');
-      return false;
+      if (layerTypes[layerDefinition.type].mustHaveKey && !isDefined(layerDefinition.key)) {
+        $log.error('[AngularJS - Leaflet] The type of layer ' + layerDefinition.type + ' must have key defined');
+        return false;
+      }
+    } else {
+      // Type unknown at build time
+      if (typeof L.tileLayer[layerDefinition.type] !== 'function') {
+        return false;
+      }
     }
 
     return true;
@@ -530,7 +534,8 @@ angular.module('leaflet-directive')
     };
 
     //TODO Add $watch to the layer properties
-    return layerTypes[layerDefinition.type].createLayer(params);
+    if (layerTypes[layerDefinition.type]) return layerTypes[layerDefinition.type].createLayer(params);
+    return L.tileLayer[layerDefinition.type](params.url, params.options);
   }
 
   function safeAddLayer(map, layer) {
