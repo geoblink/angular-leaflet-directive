@@ -531,11 +531,12 @@ angular.module('leaflet-directive')
       apiKey: layerDefinition.apiKey,
       pluginOptions: layerDefinition.pluginOptions,
       user: layerDefinition.user,
+      headers: layerDefinition.headers,
     };
 
     //TODO Add $watch to the layer properties
     if (layerTypes[layerDefinition.type]) return layerTypes[layerDefinition.type].createLayer(params);
-    return L.tileLayer[layerDefinition.type](params.url, params.options);
+    return L.tileLayer[layerDefinition.type](params.url, params.options, params.headers);
   }
 
   function safeAddLayer(map, layer) {

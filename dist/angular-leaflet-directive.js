@@ -28,7 +28,7 @@
  */
 
 /*!
-*  angular-leaflet-directive 0.10.1 2017-02-15
+*  angular-leaflet-directive 0.10.1 2019-07-26
 *  angular-leaflet-directive - An AngularJS directive to easily interact with Leaflet maps
 *  git: https://github.com/tombatossals/angular-leaflet-directive
 */
@@ -2090,11 +2090,12 @@ angular.module('leaflet-directive')
       apiKey: layerDefinition.apiKey,
       pluginOptions: layerDefinition.pluginOptions,
       user: layerDefinition.user,
+      headers: layerDefinition.headers,
     };
 
     //TODO Add $watch to the layer properties
     if (layerTypes[layerDefinition.type]) return layerTypes[layerDefinition.type].createLayer(params);
-    return L.tileLayer[layerDefinition.type](params.url, params.options);
+    return L.tileLayer[layerDefinition.type](params.url, params.options, params.headers);
   }
 
   function safeAddLayer(map, layer) {
